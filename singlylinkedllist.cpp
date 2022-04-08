@@ -125,6 +125,24 @@ Node* midPoint(Node* head) {
 	}
 	return slow;
 }
+
+Node* reverseLL(Node* head) {
+	if (head == null or head->next == null) {
+		return head;
+	}
+
+	Node* curr = head;
+	Node* prev = null;
+
+	while (curr != null) {
+		Node* nextNum = curr->next;
+		curr->next = prev;
+		prev = curr;
+		curr = nextNum;
+	}
+	return prev;
+}
+
 Node* detectCycle(Node* head) {
 
 	if (head == null) {
@@ -176,6 +194,131 @@ void removeCycle(Node* head) {
 	temp->next = null;
 }
 
+Node* reverseKnodes(Node* head, int k) {
+	if (head == null || size(head) < k) {
+		return head;
+	}
+
+	Node* curr = head;
+	Node* prev = null;
+	Node* nextNode = NULL;
+	int count = 0;
+
+	while (curr && count < k) {
+		nextNode = curr->next;
+		curr->next = prev;
+		prev = curr;
+		curr = nextNode;
+		count++;
+	}
+
+	//recursion
+
+	if (nextNode != null) {
+		head->next = reverseKnodes(nextNode, k);
+	}
+
+
+	return prev;
+}
+
+bool isCircular(Node* head) {
+
+	if (head == NULL or head->next == NULL) {
+		return true;
+	}
+
+	Node* temp = head->next;
+
+	while (temp != NULL and temp != head) {
+		temp = temp->next;
+	}
+	if (temp == head) return true;
+
+	return false;
+}
+
+Node* removeDuplicateFromSortedLL(Node* &head) {
+	if (head == NULL || head->next == NULL)	return head;
+
+
+	Node* curr = head;
+
+	while (curr->next != NULL) {
+		if (curr->data == curr->next->data) {
+			Node* next = curr->next->next;
+			Node* toBeDeleted = curr->next;
+			delete(toBeDeleted);
+			curr->next = next;
+		} else {
+			curr = curr->next;
+		}
+	}
+	return head;
+}
+Node* sortedMerge(Node* &a, Node* &b) {
+	Node* result = NULL;
+
+
+	if (a == null)	return b;
+	if (b == null) return a;
+
+	if (a->data <= b->data) {
+		result = a;
+		result->next = sortedMerge(a->next, b);
+	} else {
+		result = b;
+		result->next = sortedMerge(a, b->next);
+	}
+	return result;
+}
+
+
+Node* mergeSort(Node* &head) {
+	if (head == null or head->next == null) {
+		return head;
+	}
+
+	Node* mid = midPoint(head);
+	Node* p = head;
+
+	Node* q = mid->next;
+
+	mid->next = null;
+
+	p = mergeSort(p);
+	q = mergeSort(q);
+
+	Node* result = sortedMerge(p, q);
+	return result;
+}
+
+Node* removeDuplicateFromUnsortedLL(Node* head) {
+
+	Node* ptr = head;
+
+
+	while (ptr->next) {
+
+		Node* ptr1 = ptr;
+
+		while (ptr1->next) {
+
+			if (ptr->data == ptr1->next->data) {
+				Node* toBeDeleted = ptr1->next;
+				ptr1->next = ptr1->next->next;
+				delete toBeDeleted;
+			} else {
+				ptr1 = ptr1->next;
+			}
+		}
+
+		ptr = ptr->next;
+	}
+	return head;
+}
+
+
 int32_t main()
 {
 	Node* head = NULL;
@@ -186,6 +329,9 @@ int32_t main()
 	}
 
 	printLinkedList(head);
+	// head = mergeSort(head);
+	head = removeDuplicateFromUnsortedLL(head);
+	printLinkedList(head);
 	//deleteAtTail(head);
 	// insertAtAnyIndex(head,9,3);
 	// printLinkedList(head);
@@ -193,17 +339,22 @@ int32_t main()
 	// printLinkedList(head);
 
 
-	cout << "size of LinkedList -> " << size(head) << endl;
-	cout << "midpoint of LL is : " << midPoint(head)->data << endl;
+	// cout << "size of LinkedList -> " << size(head) << endl;
+	// cout << "midpoint of LL is : " << midPoint(head)->data << endl;
 
-	/* Create a loop for testing */
-	head->next->next->next->next = head;
-	(detectCycle(head) != null) ? cout << "Cycle Detected" : cout << "Cycle Not Detected";
-	cout << endl;
-	Node* cycleStartingPoint = startingPointOfCycle(head);
-	cout << "Cycle starting at point : " << cycleStartingPoint->data << endl;
-	removeCycle(head);
-	printLinkedList(head);
+	// /* Create a loop for testing */
+	// head->next->next->next->next = head;
+	// (detectCycle(head) != null) ? cout << "Cycle Detected" : cout << "Cycle Not Detected";
+	// cout << endl;
+	// Node* cycleStartingPoint = startingPointOfCycle(head);
+	// cout << "Cycle starting at point : " << cycleStartingPoint->data << endl;
+	// removeCycle(head);
+	// printLinkedList(head);
+	//printLinkedList(reverseLL(head));
+	//printLinkedList(reverseKnodes(head, 3));
 
+	//(isCircular(head)) ? cout << "Yes" : cout << "No";
+	// head = removeDuplicateFromSortedLL(head);
+	// printLinkedList(head);
 	return 0;
 }
