@@ -318,6 +318,101 @@ Node* removeDuplicateFromUnsortedLL(Node* head) {
 	return head;
 }
 
+bool isPalindrome(Node* head) {
+
+	if (head == NULL or head->next == NULL)	return true;
+
+	Node* mid = midPoint(head);
+
+	Node* temp = mid->next;
+	mid->next = reverseLL(temp);
+
+	Node* h1 = head;
+	Node* h2 = mid->next;
+
+	while (h1 and h2) {
+		if (h1->data != h2->data)	return false;
+
+		h1 = h1->next; h2 = h2->next;
+	}
+
+	mid->next = reverseLL(temp);
+
+	return true;
+}
+Node* reverserecursiveLL(Node* head) {
+	if (head == NULL or head->next == NULL)	return head;
+
+	Node* newHead = reverserecursiveLL(head->next);
+
+	Node* headnext = head->next;
+	headnext->next = head;
+	head->next = NULL;
+
+	return newHead;
+}
+Node* addtwoLL(Node* a1, Node* b1) {
+
+	Node* result = NULL;
+
+	Node* a = reverserecursiveLL(a1);
+	Node* b = reverserecursiveLL(b1);
+
+	int carry = 0;
+
+	while (a != null and b != null) {
+		int sum = (a->data + b->data) % 10;
+		sum += carry;
+		carry = (a->data + b->data) / 10;
+		insertAtHead(result, sum);
+		a = a->next;
+		b = b->next;
+	}
+
+	while (a != null) {
+		insertAtHead(result, a->data + carry);
+		carry = a->data / 10;
+		a = a->next;
+	}
+	while (b != null) {
+		insertAtHead(result, b->data + carry);
+		carry = b->data / 10;
+		b = b->next;
+	}
+
+	if (carry > 0) {
+		insertAtHead(result, carry) ;
+	}
+
+	return result;
+}
+
+Node* rotateList(Node* head, int k) {
+
+	if (head == NULL)	return head;
+
+	int n = 1;
+
+	Node* curr = head;
+	while (curr->next != NULL) {
+		curr = curr->next;
+		n++;
+	}
+
+	k = k % n;
+	if (k == 0)	return head;
+
+	k = n - k;
+	curr->next = head;
+	while (k--)	curr = curr->next;
+
+	head = curr->next;
+	curr->next = NULL;
+
+
+	return head;
+}
+
 
 int32_t main()
 {
@@ -328,16 +423,31 @@ int32_t main()
 		insertAtTail(head, k);
 	}
 
-	printLinkedList(head);
+	// cin >> n;
+	// Node* head1 = NULL;
+	// for (int i = 0; i < n; i++) {
+	// 	int k; cin >> k;
+	// 	insertAtTail(head1, k);
+	// }
+	int k; cin >> k;
+	head = rotateList(head, k);
+	//printLinkedList(head);
 	// head = mergeSort(head);
-	head = removeDuplicateFromUnsortedLL(head);
+	//head = removeDuplicateFromUnsortedLL(head);
 	printLinkedList(head);
+	//printLinkedList(head1);
+	// head = reverserecursiveLL(head);
+	// head1 = reverserecursiveLL(head1);
+	// printLinkedList(head1);
+	// printLinkedList(head);
+	//cout << isPalindrome(head) << endl;
 	//deleteAtTail(head);
 	// insertAtAnyIndex(head,9,3);
 	// printLinkedList(head);
 	// deleteAtAnyIndex(head,3);
 	// printLinkedList(head);
-
+	//Node* res = addtwoLL(head, head1);
+	//printLinkedList(res);
 
 	// cout << "size of LinkedList -> " << size(head) << endl;
 	// cout << "midpoint of LL is : " << midPoint(head)->data << endl;
