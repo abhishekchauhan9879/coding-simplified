@@ -251,21 +251,52 @@ void solveJosephusProblem(vector<int>&v, int idx, int k, int& ans) {
 	solveJosephusProblem(v, idx, k, ans);
 }
 
+string reverseString (string s) {
+
+	if (s.length() == 1) {
+		return s;
+	}
+
+	string ans = reverseString(s.substr(1)) + s[0];
+
+	return ans;
+}
+
+int power(int base, int n) {
+
+	if (n == 0)	return 1;
+
+	if (n == 1)	return base;
+
+
+	int ans = power(base, n / 2);
+
+	if (!(n & 1)) {
+		return ans * ans;
+	} else {
+		return base * ans * ans;
+	}
+
+}
 int32_t main()
 {
 
 //	cout << kthgrammer(3, 2);
 
 	vector<int> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
+	cout << power(2, 0);
+
 	//permutationwithspaces("ABC", "");
 	// permutationCaseChange("ab", "");
 	//permutationLetterChange("a1B2", "");
 	//generateParenthesis(3, 3, "");
 	//nthbitmore1(0, 0, "", 3);
-	int ans = -1;
-	int k = 2;
-	solveJosephusProblem(v, 0, k - 1 , ans);
-	cout << ans << endl;
+	// string s = reverseString("angel");
+	// cout << s << endl;
+	// int ans = -1;
+	// int k = 2;
+	//solveJosephusProblem(v, 0, k - 1 , ans);
+	// cout << ans << endl;
 	//towerOfHanoi(2, "A", "C", "B");
 	//printsubsequences("abc", "");
 	// int n; cin >> n;
