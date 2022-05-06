@@ -37,6 +37,7 @@ Node* buildTree() {
 }
 void preorderIterative(Node* root)
 {
+	//https://www.techiedelight.com/preorder-tree-traversal-iterative-recursive/
 	if (root == NULL) {
 		return;
 	}
@@ -44,29 +45,19 @@ void preorderIterative(Node* root)
 	stack<Node*> s;
 	s.push(root);
 
-	Node* curr = root;
-
 	while (!s.empty()) {
 
-		if (curr != NULL) {
-			cout << curr->data << " ";
+		Node* curr = s.top();
+		s.pop();
+		cout << curr->data << " ";
 
-			if (curr->right != NULL) {
-				s.push(curr->right);
-			}
-
-			curr = curr->left;
-		}
-		else {
-			curr = s.top();
-			s.pop();
-		}
-
+		if (curr->right)	s.push(curr->right);
+		if (curr->left)	s.push(curr->left);
 	}
 }
 
 void inorderIterative(Node* root) {
-
+// https://www.techiedelight.com/inorder-tree-traversal-iterative-recursive/
 	if (root == NULL) {
 		return;
 	}
@@ -91,20 +82,30 @@ void inorderIterative(Node* root) {
 	}
 }
 void postorderIterative(Node* root) {
-
+//https://www.techiedelight.com/postorder-tree-traversal-iterative-recursive/
 	if (root == NULL) {
 		return;
 	}
 
 	stack<Node*> s;
 
-	Node* curr = root;
+	s.push(root);
 
-	while (!s.empty() or curr != NULL) {
+	//To reverse the output
+	stack<Node*> out;
+	while (!s.empty()) {
 
+		Node* curr = s.top();
+		s.pop();
 
+		out.push(curr);
 
-
+		if (curr->left)	s.push(curr -> left);
+		if (curr->right)	s.push(curr->right);
+	}
+	while (!out.empty()) {
+		cout << out.top()->data << " ";
+		out.pop();
 	}
 }
 
@@ -670,6 +671,7 @@ void solveSumk(Node* root, int k, int &count, vector<int> paths) {
 		sum += paths[i];
 		if (sum == k)    count++;
 	}
+	print(paths);
 	paths.pop_back();
 }
 int sumK(Node *root, int k)
@@ -679,6 +681,35 @@ int sumK(Node *root, int k)
 	int count = 0;
 	solveSumk(root, k, count, paths);
 	return count;
+}
+//*************************** Print K sum paths ***************
+//Time Complexity: O(n*h*h),Space Complexity: O(h)
+void printSumkhelper(Node* root, int k,  vector<int>& paths) {
+	if (root == NULL)    return ;
+
+	paths.push_back(root->data);
+
+	printSumkhelper(root->left, k, paths);
+	printSumkhelper(root->right, k, paths);
+
+	int sum = 0;
+	for (int i = paths.size() - 1; i >= 0; i--) {
+		sum += paths[i];
+		if (sum == k) {
+			for (int j = i; j < paths.size(); j++) {
+				cout << paths[j] << " ";
+			}
+			cout << endl;
+		}
+	}
+
+	paths.pop_back();
+}
+void printSumK(Node *root, int k)
+{
+	// code here
+	vector<int> paths;
+	printSumkhelper(root, k, paths);
 }
 //*********************kth ancestor**************************
 Node* solveKthAncestor(Node* root, int &k, int node) {
@@ -1081,7 +1112,182 @@ Node* mergeTrees(Node* root1, Node* root2) {
 
 	return root;
 }
-//************************************************************************
+//**************************** Nth Binary tree ***************************
+int checkMirrorTree(int n, int e, int A[], int B[]) {
+	// code here
+	unordered_map<int, stack<int>> mp;
+	for (int i = 0; i < 2 * e; i += 2) {
+		mp[A[i]].push(A[i + 1]);
+	}
+	for (int i = 0; i < 2 * e; i += 2) {
+		if (mp[B[i]].top() != B[i + 1])    return 0;
+		mp[B[i]].pop();
+	}
+	return 1;
+}
+//************************** Find Largest subtree sum in a tree ************
+int findLargestSumTreeSumHelper(Node* root, int& ans) {
+	if (!root)	return 0;
+
+	int temp = root->data + findLargestSumTreeSumHelper(root->left, ans) + findLargestSumTreeSumHelper(root->right, ans);
+
+	ans = max(ans, temp);
+	return temp;
+}
+int findLargestSumTreeSum(Node* root) {
+
+	int ans = INT_MIN;
+	findLargestSumTreeSumHelper(root, ans);
+	return ans;
+}
+//****************************** Min distance between two given nodes of a Binary Tree***********************
+Node* FindLCA(Node* root, int a, int b) {
+	if (!root)   return root;
+
+	if (root->data == a || root->data == b) {
+		return root;
+	}
+
+	Node* l = FindLCA(root->left, a, b);
+	Node* r = FindLCA(root->right, a, b);
+
+	if (!l && !r)  return NULL;
+	else if (!l && r)    return r;
+	else if (l && !r)  return l;
+	return root;
+}
+int FindDist(Node* root, int a) {
+	if (!root)   return 0;
+	if (root->data == a)   return 1;
+
+	int l = FindDist(root->left, a);
+	int r = FindDist(root->right, a);
+
+	if (!l && !r)    return 0;
+	if (!l) return r + 1;
+	if (!r) return l + 1;
+
+	return min(l, r) + 1;
+}
+int findDist(Node* root, int a, int b) {
+	// Your code here
+	Node* temp = FindLCA(root, a, b);
+	int aDist = FindDist(temp, a);
+	int bDist = FindDist(temp, b);
+
+	return aDist + bDist - 2;
+}
+//******************************* Leaf at same level ****************
+bool checkLeafNodeAtSameLevel(Node *root)
+{
+	//Your code here
+	if (!root)   return root;
+
+	queue<Node*>q;
+	q.push(root);
+	int leafNodeLevel = -1;
+	int level = 0;
+
+	while (!q.empty()) {
+		int n = q.size();
+		bool flag = false;
+		for (int i = 0; i < n; i++) {
+			Node* curr = q.front();
+			q.pop();
+
+			if (!curr->left && !curr->right) {
+				if (leafNodeLevel == -1) {
+					leafNodeLevel = max(leafNodeLevel, level);
+				}
+				else if (leafNodeLevel != level) {
+					return false;
+				}
+			}
+			if (curr->left) {
+				flag = true;
+				q.push(curr->left);
+			}
+			if (curr->right) {
+				flag = true;
+				q.push(curr->right);
+			}
+		}
+		if (flag)    level++;
+	}
+	return true;
+}
+//*********************************** Duplicate SubTrees *****************************
+string dupSubTree(Node* root, unordered_map<string , int>& mymap, vector<Node*>& res) {
+	if (!root)   return "";
+
+	string s = to_string(root->data);
+	string l = dupSubTree(root->left, mymap, res);
+	string r = dupSubTree(root->right, mymap, res);
+
+	s += ("L" + l + "R" + r);
+	if (mymap[s]++ == 1)  res.push_back(root);
+	return s;
+}
+vector<Node*> printAllDups(Node* root)
+{
+	// Code here
+	unordered_map<string , int>  mymap;
+	vector<Node*> res;
+	dupSubTree(root, mymap, res);
+	return res;
+}
+//****************************** Duplicate subtree in Binary Tree *******************************
+string dupSubHelper(Node* root , unordered_map<string, int>& mymap ) {
+	if (!root)   return "$";
+
+	string s = "";
+
+	string l = dupSubHelper(root->left, mymap);
+	if (l.compare(s) == 0) return l;
+	string r = dupSubHelper(root->right, mymap);
+	if (r.compare(s) == 0) return r;
+
+	s = s + to_string(root->data) + l + r;
+
+	if (s.length() > 3 && mymap.find(s) != mymap.end()) {
+		return "";
+	}
+	mymap[s]++;
+	return s;
+}
+int dupSub(Node *root) {
+	// code here
+	unordered_map<string, int> mymap;
+	string ans = dupSubHelper(root, mymap);
+	return (ans.compare("") == 0);
+}
+//************** Maximum Sum of nodes in Binary tree such that no two are adjacent ******************
+pair<int, int> getMaxSumHelper(Node* root) {
+	pair<int, int> ans;
+	if (!root) {
+		ans = make_pair(0, 0);
+		return ans;
+	}
+	pair<int, int> l = getMaxSumHelper(root->left);
+	pair<int, int> r = getMaxSumHelper(root->right);
+
+	//if root is included then sum the left and right second parts
+	ans.first = l.second + r.second + root->data;
+
+	// if root is not included then check which path to be executed
+	//  by taking max comparison between included and excluded case
+	ans.second = max(l.first, l.second) + max(r.first, r.second);
+
+	return ans;
+
+}
+int getMaxSum(Node *root)
+{
+	// Add your code here
+	pair<int, int> res = getMaxSumHelper(root);
+	return max(res.first, res.second);
+}
+//****************************************************************************************************
 int32_t main()
 {
 
@@ -1097,13 +1303,29 @@ int32_t main()
 	Node* root = new Node(1);
 	root->left = new Node(2);
 	root->right = new Node(3);
-	// root->left->left = new Node(4);
-	// root->left->right = new Node(5);
-	root->right->left = new Node(4);
-	root->right->left->right = new Node(5);
-	//root->right->left->left = new Node(40);
-
-	preorder(removehalfNodes(root));
+	root->left->left = new Node(4);
+	root->left->right = new Node(5);
+	root->right->left = new Node(6);
+	root->right->right = new Node(7);
+	// Node* root = new Node(1);
+	// root->left = new Node(3);
+	// root->left->left = new Node(2);
+	// root->left->right = new Node(1);
+	// root->left->right->left = new Node(1);
+	// root->right = new Node(-1);
+	// root->right->left = new Node(4);
+	// root->right->left->left = new Node(1);
+	// root->right->left->right = new Node(2);
+	// root->right->right = new Node(5);
+	// root->right->right->right = new Node(2);
+	preorderIterative(root);
+	cout << endl;
+	postorderIterative(root);
+	// root->right->left->right = new Node(5);
+	// root->right->left->left = new Node(40);
+	//printSumK(root, 5);
+	// cout << "LargestSubtreeSum: " << findLargestSumTreeSum(root) << endl;
+	//preorder(removehalfNodes(root));
 	// vector<int> arr;
 	// pathToGivenNode(root, arr, 2);
 	// print(arr);
@@ -1114,27 +1336,27 @@ int32_t main()
 	// cout << mx;
 	//cout << btIntoSumTree(root);
 	//preorder(temp);
-	cout << endl;
+	// cout << endl;
 	//creating a Tree
 	// root = buildTree();
 
 	//root = buildTree(root);
-	preorder(root);
-	cout << endl;
-	inorder(root);
-	cout << endl;
-	postorder(root);
-	cout << endl;
-	cout << "Left view Iterative: " << endl;
-	leftviewIterative(root);
-	cout << endl << "Left view Recursive: " << endl;
-	int maxLevel = 0;
-	leftviewRecursive(root, 1, &maxLevel);
-	cout << endl << "right view Iterative: " << endl;
-	rightviewIterative(root);
-	cout << endl << "right view Recursive: " << endl;
-	maxLevel = 0;
-	rightviewRecursive(root, 1, &maxLevel);
+	//preorder(root);
+	// cout << endl;
+	// inorder(root);
+	// cout << endl;
+	// postorder(root);
+	// cout << endl;
+	// cout << "Left view Iterative: " << endl;
+	// leftviewIterative(root);
+	// cout << endl << "Left view Recursive: " << endl;
+	// int maxLevel = 0;
+	// leftviewRecursive(root, 1, &maxLevel);
+	// cout << endl << "right view Iterative: " << endl;
+	// rightviewIterative(root);
+	// cout << endl << "right view Recursive: " << endl;
+	// maxLevel = 0;
+	// rightviewRecursive(root, 1, &maxLevel);
 
 	//cout << endl << "Level Order Traversal :" << endl;
 	// levelordertraversal(root);
